@@ -16,27 +16,54 @@ class PhoneBook extends Component {
   addContact = event => {
     event.preventDefault();
     const form = event.target;
+    let prevContacts = this.state.contacts.map(({ name }) =>
+      name.toLocaleLowerCase()
+    );
+    let bool = prevContacts.includes(
+      form.elements.name.value.toLocaleLowerCase()
+    );
+    if(bool){
+      console.log(form.elements.name.value);
+      form.reset();
+      alert(`${form.elements.name.value} is already in contacts`);
+      return
+    }
     const obj = {
       id: nanoid(),
       name: form.elements.name.value,
       number: form.elements.number.value,
     };
+
     this.setState(prevState => {
       prevState.contacts.push(obj);
       return { contacts: [...prevState.contacts] };
     });
     form.reset();
   };
-  filter = evt => {};
+  filter = evt => {
+    const filterValue = evt.target.value;
+    this.setState({ filter: filterValue.toLocaleLowerCase() });
+  };
+
+  delete = id => {
+    console.log(id);
+    this.setState(prevState => {
+      let x = prevState.contacts.filter(contact => contact.id !== id);
+      return { contacts: [...x] };
+    });
+  };
 
   render() {
+    const filterContacts = this.state.contacts.filter(contact =>
+      contact.name.toLocaleLowerCase().includes(this.state.filter)
+    );
     return (
       <div>
         <h1>Phonebook</h1>
         <ContactForm addContact={this.addContact} />
         <h2>Contacts</h2>
-        <Filter filter={this.state} />
-        <ContactList />
+        <Filter filter={this.filter} />
+        <ContactList contacts={filterContacts} onDelete={this.delete} />
       </div>
     );
   }
