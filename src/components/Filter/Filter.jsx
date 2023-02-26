@@ -1,8 +1,17 @@
+import { PropTypes } from 'prop-types';
+import {FilterSection, Label, Input} from './Filter.module'
+
 export const Filter = ({ filter }) => {
   return (
-    <label>
+    <FilterSection>
+    <Label>
       Filter contact by Name
-      <input type="text" onChange={filter} />
-    </label>
+      <Input type="text" onChange={filter} />
+    </Label>
+    </FilterSection>
   );
+};
+
+Filter.prototype = {
+  filter: PropTypes.func,
 };

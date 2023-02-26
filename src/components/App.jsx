@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { ContactForm, ContactList, Filter } from './';
 import { nanoid } from 'nanoid';
+import { PhoneBookStyled } from './App.module';
+import { PropTypes } from 'prop-types';
 
 class PhoneBook extends Component {
   state = {
@@ -13,32 +15,25 @@ class PhoneBook extends Component {
     filter: '',
   };
 
-  addContact = event => {
-    event.preventDefault();
-    const form = event.target;
+  addContact = (contact, number) => {
     let prevContacts = this.state.contacts.map(({ name }) =>
       name.toLocaleLowerCase()
     );
-    let bool = prevContacts.includes(
-      form.elements.name.value.toLocaleLowerCase()
-    );
-    if(bool){
-      console.log(form.elements.name.value);
-      form.reset();
-      alert(`${form.elements.name.value} is already in contacts`);
-      return
+    let bool = prevContacts.includes(contact.toLocaleLowerCase());
+    if (bool) {
+      alert(`${contact} is already in contacts`);
+      return;
     }
     const obj = {
       id: nanoid(),
-      name: form.elements.name.value,
-      number: form.elements.number.value,
+      name: contact,
+      number: number,
     };
 
     this.setState(prevState => {
       prevState.contacts.push(obj);
       return { contacts: [...prevState.contacts] };
     });
-    form.reset();
   };
   filter = evt => {
     const filterValue = evt.target.value;
@@ -46,7 +41,6 @@ class PhoneBook extends Component {
   };
 
   delete = id => {
-    console.log(id);
     this.setState(prevState => {
       let x = prevState.contacts.filter(contact => contact.id !== id);
       return { contacts: [...x] };
@@ -58,16 +52,29 @@ class PhoneBook extends Component {
       contact.name.toLocaleLowerCase().includes(this.state.filter)
     );
     return (
-      <div>
+      <PhoneBookStyled>
         <h1>Phonebook</h1>
         <ContactForm addContact={this.addContact} />
         <h2>Contacts</h2>
         <Filter filter={this.filter} />
         <ContactList contacts={filterContacts} onDelete={this.delete} />
-      </div>
+      </PhoneBookStyled>
     );
   }
 }
 export const App = () => {
-  return <PhoneBook />;
+  return (
+      <PhoneBook />
+  );
 };
+
+PhoneBook.propTypes = {
+  contacts: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      number: PropTypes.string,
+    })
+  ),
+  filter: PropTypes.string,
+}
